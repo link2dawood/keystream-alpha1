@@ -68,6 +68,7 @@ class Email extends NotifyProcess implements Notifiable {
             'smtp'     => 'sendSmtpMail',
             'sendgrid' => 'sendSendGridMail',
             'mailjet'  => 'sendMailjetMail',
+            'mailgun'  => 'sendMailgunMail',
         ];
         return $methods[$name];
     }
@@ -122,6 +123,31 @@ class Email extends NotifyProcess implements Notifiable {
         if ($response->statusCode() != 202) {
             throw new Exception(json_decode($response->body())->errors[0]->message);
 
+        }
+    }
+
+    protected function sendMailgunMail() {
+        $config  = gs('mail_config');
+        $domain  = $config->domain;
+        $apiKey  = $config->api_key;
+        $baseUrl = ($config->region ?? 'us') === 'eu'
+            ? "https://api.eu.mailgun.net/v3/{$domain}/messages"
+            : "https://api.mailgun.net/v3/{$domain}/messages";
+
+        $client   = new \GuzzleHttp\Client();
+        $response = $client->post($baseUrl, [
+            'auth'        => ['api', $apiKey],
+            'form_params' => [
+                'from'    => $this->getEmailFrom()['name'] . ' <' . $this->getEmailFrom()['email'] . '>',
+                'to'      => $this->email,
+                'subject' => $this->subject,
+                'html'    => $this->finalMessage,
+            ],
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            $body = json_decode($response->getBody()->getContents());
+            throw new Exception($body->message ?? 'Mailgun API error');
         }
     }
 

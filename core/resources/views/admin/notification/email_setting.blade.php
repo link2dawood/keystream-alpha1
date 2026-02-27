@@ -20,6 +20,8 @@
                                 </option>
                                 <option value="mailjet" @if (gs('mail_config')->name == 'mailjet') selected @endif>@lang('Mailjet API')
                                 </option>
+                                <option value="mailgun" @if (gs('mail_config')->name == 'mailgun') selected @endif>@lang('Mailgun API')
+                                </option>
                             </select>
                         </div>
                         <div class="row mt-4 d-none configForm" id="smtp">
@@ -104,6 +106,34 @@
                                 <label>@lang('App Key') </label>
                                 <input type="text" class="form-control" placeholder="@lang('SendGrid App key')" name="appkey"
                                     value="{{ gs('mail_config')->appkey ?? '' }}">
+                            </div>
+                        </div>
+                        <div class="row mt-4 d-none configForm" id="mailgun">
+                            <div class="col-md-12">
+                                <h6 class="mb-2">@lang('Mailgun API Configuration')</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('Domain Name') </label>
+                                    <input type="text" class="form-control" placeholder="@lang('e.g. mg.yourdomain.com')"
+                                        name="domain" value="{{ gs('mail_config')->domain ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('API Key') </label>
+                                    <input type="text" class="form-control" placeholder="@lang('Mailgun API Key')"
+                                        name="api_key" value="{{ gs('mail_config')->api_key ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('Region')</label>
+                                    <select class="form-control select2" data-minimum-results-for-search="-1" name="region">
+                                        <option value="us" @selected((@gs('mail_config')->region ?? 'us') == 'us')>@lang('US')</option>
+                                        <option value="eu" @selected((@gs('mail_config')->region ?? 'us') == 'eu')>@lang('EU')</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="row mt-4 d-none configForm" id="mailjet">

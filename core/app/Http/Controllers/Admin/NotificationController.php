@@ -115,7 +115,7 @@ class NotificationController extends Controller
     public function emailSettingUpdate(Request $request)
     {
         $request->validate([
-            'email_method' => 'required|in:php,smtp,sendgrid,mailjet',
+            'email_method' => 'required|in:php,smtp,sendgrid,mailjet,mailgun',
             'host' => 'required_if:email_method,smtp',
             'port' => 'required_if:email_method,smtp',
             'username' => 'required_if:email_method,smtp',
@@ -124,6 +124,9 @@ class NotificationController extends Controller
             'appkey' => 'required_if:email_method,sendgrid',
             'public_key' => 'required_if:email_method,mailjet',
             'secret_key' => 'required_if:email_method,mailjet',
+            'domain' => 'required_if:email_method,mailgun',
+            'api_key' => 'required_if:email_method,mailgun',
+            'region' => 'required_if:email_method,mailgun|in:us,eu',
         ], [
             'host.required_if' => 'The :attribute is required for SMTP configuration',
             'port.required_if' => 'The :attribute is required for SMTP configuration',
@@ -133,6 +136,8 @@ class NotificationController extends Controller
             'appkey.required_if' => 'The :attribute is required for SendGrid configuration',
             'public_key.required_if' => 'The :attribute is required for Mailjet configuration',
             'secret_key.required_if' => 'The :attribute is required for Mailjet configuration',
+            'domain.required_if' => 'The :attribute is required for Mailgun configuration',
+            'api_key.required_if' => 'The :attribute is required for Mailgun configuration',
         ]);
         if ($request->email_method == 'php') {
             $data['name'] = 'php';
@@ -145,6 +150,9 @@ class NotificationController extends Controller
         } else if ($request->email_method == 'mailjet') {
             $request->merge(['name' => 'mailjet']);
             $data = $request->only('name', 'public_key', 'secret_key');
+        } else if ($request->email_method == 'mailgun') {
+            $request->merge(['name' => 'mailgun']);
+            $data = $request->only('name', 'domain', 'api_key', 'region');
         }
         $general = gs();
         $general->mail_config = $data;
